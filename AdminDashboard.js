@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 
 const AdminDashboard = ({ packages, setPackages }) => {
   const [newPackage, setNewPackage] = useState({
@@ -10,6 +8,7 @@ const AdminDashboard = ({ packages, setPackages }) => {
     days: "",
     date: "",
     description: "",
+    itinerary: "",
     image: "",
   });
 
@@ -17,7 +16,7 @@ const AdminDashboard = ({ packages, setPackages }) => {
 
   const handleAddPackage = () => {
     setPackages([...packages, { ...newPackage, id: Date.now() }]);
-    setNewPackage({ name: "", price: "", days: "", date: "", description: "", image: "" });
+    setNewPackage({ name: "", price: "", days: "", date: "", description: "", itinerary: "", image: "" });
   };
 
   const handleDeletePackage = (id) => {
@@ -55,69 +54,62 @@ const AdminDashboard = ({ packages, setPackages }) => {
     }
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
-    <div>
+    <div className="container mt-5">
+      <h2 className="text-center fw-bold">Admin Dashboard - Manage Packages</h2>
 
-      <div className="container mt-5">
-        <h2 className="text-center fw-bold">Admin Dashboard - Manage Packages</h2>
-        
-        <div className="mb-4">
-          <h4>Add New Package</h4>
-          <input type="text" className="form-control mb-2" placeholder="Package Name" value={newPackage.name} onChange={(e) => setNewPackage({ ...newPackage, name: e.target.value })} />
-          <input type="text" className="form-control mb-2" placeholder="Price" value={newPackage.price} onChange={(e) => setNewPackage({ ...newPackage, price: e.target.value })} />
-          <input type="text" className="form-control mb-2" placeholder="Duration" value={newPackage.days} onChange={(e) => setNewPackage({ ...newPackage, days: e.target.value })} />
-          <input type="date" className="form-control mb-2" value={newPackage.date} onChange={(e) => setNewPackage({ ...newPackage, date: e.target.value })} />
-          <textarea className="form-control mb-2" placeholder="Description" value={newPackage.description} onChange={(e) => setNewPackage({ ...newPackage, description: e.target.value })}></textarea>
-          <input type="file" className="form-control mb-2" onChange={handleImageChange} />
-          <button className="btn btn-success" onClick={handleAddPackage}>Add Package</button>
-        </div>
-        
-        <div className="row d-flex justify-content-center">
-          {packages.map((pkg) => (
-            <div key={pkg.id} className="col-md-4 mb-4 d-flex align-items-stretch">
-              <div className="card shadow-sm border-0 w-100" style={{ height: "550px" }}>
-                <img src={pkg.image} className="card-img-top" alt={pkg.name} style={{ height: "250px", objectFit: "cover" }} />
-                <div className="card-body text-center">
-                  <h5 className="card-title fw-bold">{pkg.name}</h5>
-                  <p className="card-text">{pkg.description}</p>
-                  <p><strong>Price:</strong> {pkg.price}</p>
-                  <p><strong>Duration:</strong> {pkg.days}</p>
-                  <p><strong>Date:</strong> {pkg.date}</p>
-                  <button className="btn btn-danger mt-2" onClick={() => handleDeletePackage(pkg.id)}>Delete</button>
-                  <button className="btn btn-primary mt-2 ms-2" onClick={() => handleEditPackage(pkg)}>Update</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Modal for editing the package */}
-        {editPackage && (
-          <div className="modal fade show" style={{ display: 'block' }} id="editPackageModal" tabIndex="-1" aria-labelledby="editPackageModalLabel" aria-hidden="true">
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title" id="editPackageModalLabel">Edit Package</h5>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setEditPackage(null)}></button>
-                </div>
-                <div className="modal-body">
-                  <input type="text" className="form-control mb-2" placeholder="Package Name" value={editPackage.name} onChange={(e) => setEditPackage({ ...editPackage, name: e.target.value })} />
-                  <input type="text" className="form-control mb-2" placeholder="Price" value={editPackage.price} onChange={(e) => setEditPackage({ ...editPackage, price: e.target.value })} />
-                  <input type="text" className="form-control mb-2" placeholder="Duration" value={editPackage.days} onChange={(e) => setEditPackage({ ...editPackage, days: e.target.value })} />
-                  <input type="date" className="form-control mb-2" value={editPackage.date} onChange={(e) => setEditPackage({ ...editPackage, date: e.target.value })} />
-                  <textarea className="form-control mb-2" placeholder="Description" value={editPackage.description} onChange={(e) => setEditPackage({ ...editPackage, description: e.target.value })}></textarea>
-                  <input type="file" className="form-control mb-2" onChange={handleEditImageChange} />
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => setEditPackage(null)}>Close</button>
-                  <button type="button" className="btn btn-primary" onClick={handleUpdatePackage}>Update Package</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="mb-4">
+        <h4>Add New Package</h4>
+        <input type="text" className="form-control mb-2" placeholder="Package Name" value={newPackage.name} onChange={(e) => setNewPackage({ ...newPackage, name: e.target.value })} />
+        <input type="text" className="form-control mb-2" placeholder="Price" value={newPackage.price} onChange={(e) => setNewPackage({ ...newPackage, price: e.target.value })} />
+        <input type="text" className="form-control mb-2" placeholder="Duration" value={newPackage.days} onChange={(e) => setNewPackage({ ...newPackage, days: e.target.value })} />
+        <input type="date" className="form-control mb-2" value={newPackage.date} onChange={(e) => setNewPackage({ ...newPackage, date: e.target.value })} />
+        <textarea className="form-control mb-2" placeholder="Description" value={newPackage.description} onChange={(e) => setNewPackage({ ...newPackage, description: e.target.value })} style={{ height: "50px" }}></textarea>
+        <textarea className="form-control mb-2" placeholder="Itinerary (e.g., hotel, flights, places to visit)" value={newPackage.itinerary} onChange={(e) => setNewPackage({ ...newPackage, itinerary: e.target.value })}></textarea>
+        <input type="file" className="form-control mb-2" onChange={handleImageChange} />
+        <button className="btn btn-success" onClick={handleAddPackage}>Add Package</button>
       </div>
-    
+
+      <table className="table table-striped mt-4">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Date</th>
+            <th style={{ width: "150px" }}>Description</th>
+            <th>Itinerary</th>
+            <th>Image</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {packages.map((pkg) => (
+            <tr key={pkg.id}>
+              <td>{pkg.name}</td>
+              <td>{pkg.price}</td>
+              <td>{pkg.days}</td>
+              <td>{formatDate(pkg.date)}</td> {/* Format the date here */}
+              <td style={{ maxWidth: "150px", wordWrap: "break-word", whiteSpace: "normal" }}>{pkg.description}</td>
+              <td style={{ maxWidth: "150px", wordWrap: "break-word", whiteSpace: "normal" }}>{pkg.itinerary}</td>
+              <td><img src={pkg.image} alt={pkg.name} style={{ width: "100px" }} /></td>
+              <td>
+                <button className="btn btn-danger btn-sm me-2" onClick={() => handleDeletePackage(pkg.id)}>Delete</button>
+                <button className="btn btn-primary btn-sm" onClick={() => handleEditPackage(pkg)}>Update</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
