@@ -10,4 +10,5 @@ public class SpringCapApplication {
 		SpringApplication.run(SpringCapApplication.class, args);
 	}
 
+
 }

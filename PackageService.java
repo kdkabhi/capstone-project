@@ -27,6 +27,7 @@ public class PackageService {
         }
     }
 
+    // Save a new package
     public Package savePackage(String name, String description, double price, int days, String date, String itinerary, List<MultipartFile> images) {
         Package packageObj = new Package();
         packageObj.setName(name);
@@ -34,7 +35,7 @@ public class PackageService {
         packageObj.setPrice(price);
         packageObj.setDays(days);
         packageObj.setDate(date);
-        packageObj.setItinerary(itinerary); // Set itinerary
+        packageObj.setItinerary(itinerary);
 
         List<String> imageUrls = images.stream().map(this::saveImage).collect(Collectors.toList());
         packageObj.setImageUrls(imageUrls);
@@ -42,6 +43,7 @@ public class PackageService {
         return packageRepository.save(packageObj);
     }
 
+    // Update an existing package
     public Package updatePackage(Long id, String name, String description, double price, int days, String date, String itinerary, List<MultipartFile> images) {
         Package packageObj = packageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Package not found"));
@@ -51,26 +53,33 @@ public class PackageService {
         packageObj.setPrice(price);
         packageObj.setDays(days);
         packageObj.setDate(date);
-        packageObj.setItinerary(itinerary); // Update itinerary
+        packageObj.setItinerary(itinerary);
 
-        List<String> imageUrls = images.stream().map(this::saveImage).collect(Collectors.toList());
-        packageObj.setImageUrls(imageUrls);
+        if (images != null && !images.isEmpty()) {
+            List<String> imageUrls = images.stream().map(this::saveImage).collect(Collectors.toList());
+            packageObj.setImageUrls(imageUrls);
+        }
 
         return packageRepository.save(packageObj);
     }
 
+    // Get all packages
     public List<Package> getAllPackages() {
         return packageRepository.findAll();
     }
 
+    // Get a package by ID
     public Package getPackageById(Long id) {
-        return packageRepository.findById(id).orElseThrow(() -> new RuntimeException("Package not found"));
+        return packageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Package not found"));
     }
 
+    // Delete a package by ID
     public void deletePackage(Long id) {
         packageRepository.deleteById(id);
     }
 
+    // Save an image and return its URL
     private String saveImage(MultipartFile file) {
         try {
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -81,5 +90,4 @@ public class PackageService {
             throw new RuntimeException("Could not store file " + file.getOriginalFilename(), e);
         }
     }
-
 }
