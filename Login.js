@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import './Login.css'; // Assuming you have a CSS file for additional styles
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import './Login.css';
+import { UserContext } from '../UserContext';
 
-const Login = ({ setUser }) => {
+const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+    const { setUser } = useContext(UserContext); // Access setUser from UserContext
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,8 +22,11 @@ const Login = ({ setUser }) => {
         });
         const data = await response.json();
         if (response.ok) {
-            setUser(data.name);
-            navigate('/'); // Redirect to AdventureAwareHome page
+            // Store user information in the state
+            setUser({ name: data.name, email: email });
+
+            // Redirect all users to the AdventureAware page
+            navigate('/');
         } else {
             setMessage(data.message);
         }
@@ -29,6 +34,7 @@ const Login = ({ setUser }) => {
 
     return (
         <div>
+            <Navbar />
             <div className="container d-flex justify-content-center align-items-center vh-100">
                 <div className="card p-4">
                     <h2 className="mb-4 text-center">Login</h2>
@@ -49,7 +55,7 @@ const Login = ({ setUser }) => {
                     </p>
                 </div>
             </div>
-            
+            <Footer />
         </div>
     );
 };

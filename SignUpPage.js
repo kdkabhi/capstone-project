@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "../components/Navbar"; // Import Navbar component
+import Footer from "../components/Footer"; // Import Footer component
 import './Login.css'; // Assuming you have a CSS file for additional styles
 
 const Signup = ({ setUser }) => {
@@ -35,6 +35,7 @@ const Signup = ({ setUser }) => {
 
     return (
         <div>
+            <Navbar user={null} /> {/* Add Navbar component */}
             <div className="container d-flex justify-content-center align-items-center vh-100">
                 <div className="card p-4">
                     <h2 className="mb-4 text-center">Sign Up</h2>
@@ -59,7 +60,7 @@ const Signup = ({ setUser }) => {
                     </p>
                 </div>
             </div>
-            
+            <Footer /> {/* Add Footer component */}
         </div>
     );
 };

@@ -1,41 +1,75 @@
-import React, { useState } from "react"; 
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import logo from './capstone logo.png';
+import logo from '../capstone logo.png';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaFacebook, FaInstagram, FaTwitter, FaStar, FaRegStar, FaTimes } from 'react-icons/fa';
-import './AdventureAwareHome.css'; // Import the CSS file for additional styles
+import './AdventureAwareHome.css';
+import { getPackages } from '../apiService'; // Correct import path
+import Navbar from '../components/Navbar'; // Correct import path
+import Footer from '../components/Footer'; // Correct import path
+import { UserContext } from '../UserContext'; // Import UserContext
 
-const AdventureAwareHome = ({ packages }) => {
-  const [favorites, setFavorites] = useState([]);
-  const [selectedItinerary, setSelectedItinerary] = useState(null);
+const AdventureAwareHome = () => {
+    const [packages, setPackages] = useState([]);
+    const [favorites, setFavorites] = useState([]);
+    const [selectedItinerary, setSelectedItinerary] = useState(null);
+    const { user } = useContext(UserContext); // Access user state
 
-  // Toggle favorite status
-  const toggleFavorite = (id) => {
-    setFavorites(favorites.includes(id) ? favorites.filter(favId => favId !== id) : [...favorites, id]);
-  };
+    useEffect(() => {
+        fetchPackages();
+    }, []);
 
-  // Show itinerary popup
-  const showItinerary = (pkg) => {
-    setSelectedItinerary(pkg);
-  };
+    const fetchPackages = async () => {
+        try {
+            const data = await getPackages();
+            setPackages(data);
+        } catch (error) {
+            console.error('Error fetching packages:', error);
+        }
+    };
 
-  // Close itinerary popup
-  const closeItinerary = () => {
-    setSelectedItinerary(null);
-  };
+    const toggleFavorite = async (pkgId) => {
+        if (!user) {
+            alert('Please login to add favorites.');
+            return;
+        }
 
-  // Function to format date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+        try {
+            const response = await fetch('http://localhost:8080/api/favorites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, packageId: pkgId }),
+            });
 
-  return (
-    <div>
+            if (response.ok) {
+                const updatedFavorites = await response.json();
+                setFavorites(updatedFavorites);
+            }
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+        }
+    };
+
+    const showItinerary = (pkg) => {
+        setSelectedItinerary(pkg);
+    };
+
+    const closeItinerary = () => {
+        setSelectedItinerary(null);
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    return (
+        <div>
+      <Navbar user={null} /> {/* Add Navbar component */}
       {/* Header */}
       <div className="container" style={{ maxWidth: '1200px', padding: 0 }}>
         <header className="text-white text-center py-5" style={{ height: '500px', width: '100%', position: 'relative' }}>
@@ -61,13 +95,13 @@ const AdventureAwareHome = ({ packages }) => {
           {packages.map((pkg) => (
             <div key={pkg.id} className="col-md-4 mb-4 d-flex align-items-stretch">
               <div className="card shadow-sm border-0 w-100" style={{ height: "600px" }}>
-                <img src={pkg.image} className="card-img-top" alt={pkg.name} style={{ height: "250px", objectFit: "cover" }} />
+                <img src={`http://localhost:8080/uploads/${pkg.imageUrls[0]}`} className="card-img-top" alt={pkg.name} style={{ height: "250px", objectFit: "cover" }} />
                 <div className="card-body text-center">
                   <h5 className="card-title fw-bold">{pkg.name}</h5>
                   <p className="card-text">{pkg.description}</p>
                   <p><strong>Price:</strong> {pkg.price}</p>
                   <p><strong>Duration:</strong> {pkg.days}</p>
-                  <p><strong>Date:</strong> {formatDate(pkg.date)}</p> {/* Format the date here */}
+                  <p><strong>Date:</strong> {formatDate(pkg.date)}</p>
 
                   {/* Buttons */}
                   <button className="btn btn-success btn-sm me-2">Book</button>
@@ -127,6 +161,7 @@ const AdventureAwareHome = ({ packages }) => {
           }
         `}
       </style>
+      <Footer /> {/* Add Footer component */}
     </div>
   );
 };
